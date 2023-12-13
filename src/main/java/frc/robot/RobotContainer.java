@@ -54,7 +54,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     joystick.povDown().onTrue(drivetrain.goToDoubleWithEntry(0));
-    joystick.povUp().onTrue(drivetrain.goToPoint(new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
+    joystick.povUp().onTrue(drivetrain.goToPoint(new Pose2d(0, 0, Rotation2d.fromDegrees(0)), 0.2));
   }
 
   public static double deadBand(double val, double deadband){

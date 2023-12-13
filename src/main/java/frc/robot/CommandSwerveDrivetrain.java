@@ -30,7 +30,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     private PathConstraints pathConstraints = new PathConstraints(
         5.0, 4.5,
-        Units.degreesToRadians(540), Units.degreesToRadians(360)
+        Units.degreesToRadians(540), Units.degreesToRadians(720)
     );
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
@@ -57,7 +57,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public ChassisSpeeds getFieldRelativeSpeeds() {
-        return ChassisSpeeds.fromFieldRelativeSpeeds(m_kinematics.toChassisSpeeds(getState().ModuleStates), m_pigeon2.getRotation2d());
+        var states = getState().ModuleStates;
+        return ChassisSpeeds.fromFieldRelativeSpeeds(m_kinematics.toChassisSpeeds(states[0], states[1], states[2], states[3]), m_pigeon2.getRotation2d());
     }
 
     public void driveRobotRelativeSpeeds(ChassisSpeeds speeds) {
@@ -75,7 +76,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             this::getFieldRelativeSpeeds,
             this::driveRobotRelativeSpeeds,
             new HolonomicPathFollowerConfig(
-                new PIDConstants(5, 0, 0.01), 
+                new PIDConstants(5.0, 0, 0), 
                 new PIDConstants(5.0, 0, 0), 
                 4.5,
                 0.6,
@@ -85,8 +86,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         );
     }
 
-    public Command goToPoint(Pose2d target) {
-        return AutoBuilder.pathfindToPose(target, pathConstraints);
+    public Command goToPoint(Pose2d target, double meterRotationDelay) {
+        return AutoBuilder.pathfindToPose(target, pathConstraints, 0, meterRotationDelay);
     }
 
     public Command goToDoubleWithEntry(double meterRotationDelay) {
