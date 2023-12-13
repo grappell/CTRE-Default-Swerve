@@ -6,10 +6,16 @@ package frc.robot;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.PPLibTelemetry;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -25,20 +31,34 @@ public class RobotContainer {
   SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric().withIsOpenLoop(true);//.withDeadband(0.5).withRotationalDeadband(1); // I want field-centric driving in open loop
   SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+
   Telemetry logger = new Telemetry(MaxSpeed);
+
+  SendableChooser<Command> autoChooser;
 
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed * (joystick.leftBumper().getAsBoolean() ? 0.25 : 1)) // Drive forward with negative Y (forward)
-            .withVelocityY(-joystick.getLeftX() * MaxSpeed * (joystick.leftBumper().getAsBoolean() ? 0.25 : 1)) // Drive left with negative X (left)
-            .withRotationalRate(-joystick.getRightX() * MaxAngularRate * (joystick.leftBumper().getAsBoolean() ? 0.5 : 1)) // Drive counterclockwise with negative X (left)
+        drivetrain.applyRequest(() -> drive
+            .withVelocityX(deadBand(-joystick.getLeftY(), 0.15) * MaxSpeed * (joystick.leftBumper().getAsBoolean() ? 0.25 : 1)) // Drive forward with negative Y (forward)
+            .withVelocityY(deadBand(-joystick.getLeftX(), 0.15) * MaxSpeed * (joystick.leftBumper().getAsBoolean() ? 0.25 : 1)) // Drive left with negative X (left)
+            .withRotationalRate(deadBand(-joystick.getRightX(), 0.2) * MaxAngularRate * (joystick.leftBumper().getAsBoolean() ? 0.5 : 1)) // Drive counterclockwise with negative X (left)
         ));
 
     joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
     joystick.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
-    joystick.y().onTrue(Commands.runOnce(() -> drivetrain.seedFieldRelative()));
+    joystick.y().onTrue(Commands.runOnce(() -> drivetrain.tareEverything()));
 
     drivetrain.registerTelemetry(logger::telemeterize);
+
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    joystick.povDown().onTrue(drivetrain.goToDoubleWithEntry(0));
+    joystick.povUp().onTrue(drivetrain.goToPoint(new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
+  }
+
+  public static double deadBand(double val, double deadband){
+    return (Math.abs(val) > Math.abs(deadband)) ? val : 0.0;
   }
 
   public RobotContainer() {
@@ -46,6 +66,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return autoChooser.getSelected();
   }
 }
