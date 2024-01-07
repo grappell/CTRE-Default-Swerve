@@ -6,6 +6,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.RobotCentric;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
@@ -26,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
 
-    private SwerveRequest.RobotCentric robotCentric = new RobotCentric().withIsOpenLoop(true);
+    private SwerveRequest.RobotCentric robotCentric = new RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     private PathConstraints pathConstraints = new PathConstraints(
         5.0, 4.5,
@@ -43,6 +44,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
+        System.out.println("request applied");
         return run(() -> this.setControl(requestSupplier.get()));
     }
 
