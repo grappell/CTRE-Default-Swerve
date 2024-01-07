@@ -1,0 +1,79 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 4.465573770491804,
+      "y": 6.010245901639344
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "First Move"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "First Piece"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "First Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Second Piece"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Second Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Third Piece"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Third Score"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

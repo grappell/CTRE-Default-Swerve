@@ -8,30 +8,35 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Intake.Intake;
 import frc.robot.generated.TunerConstants;
+import java.util.Map;
+import java.util.HashMap;
 
 public class RobotContainer {
   final double MaxSpeed = 6; // 6 meters per second desired top speed
   final double MaxAngularRate = Math.PI * 3; // Half a rotation per second max angular velocity
-
   /* Setting up bindings for necessary control of the swerve drive platform */
   CommandXboxController joystick = new CommandXboxController(0); // My joystick
   CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
   SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);//.withDeadband(0.5).withRotationalDeadband(1); // I want field-centric driving in open loop
   SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+  
 
   Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -48,6 +53,7 @@ public class RobotContainer {
     joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
     joystick.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
     joystick.y().onTrue(Commands.runOnce(() -> drivetrain.tareEverything()));
+    joystick.b().whileTrue(new Intake());
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -63,6 +69,8 @@ public class RobotContainer {
   }
 
   public RobotContainer() {
+    NamedCommands.registerCommand("IntakeNote", new Intake());
+    drivetrain.configPathFollowing();
     configureBindings();
   }
 
