@@ -60,7 +60,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public ChassisSpeeds getFieldRelativeSpeeds() {
         var states = getState().ModuleStates;
-        return ChassisSpeeds.fromFieldRelativeSpeeds(m_kinematics.toChassisSpeeds(states[0], states[1], states[2], states[3]), m_pigeon2.getRotation2d());
+        return ChassisSpeeds.fromFieldRelativeSpeeds(m_kinematics.toChassisSpeeds(states[0], states[1], states[2], states[3]), m_odometry.getEstimatedPosition().getRotation());
     }
 
     public void driveRobotRelativeSpeeds(ChassisSpeeds speeds) {
