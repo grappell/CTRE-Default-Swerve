@@ -18,6 +18,8 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
@@ -28,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
 
     private SwerveRequest.RobotCentric robotCentric = new RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    private final Field2d m_field = new Field2d();
+
 
     private PathConstraints pathConstraints = new PathConstraints(
         5.0, 4.5,
@@ -36,10 +40,12 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
+        SmartDashboard.putData("Field", m_field); 
         configPathFollowing();
     }
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
+        SmartDashboard.putData("Field", m_field); 
         configPathFollowing();
     }
 
@@ -52,6 +58,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     public void simulationPeriodic() {
         /* Assume  */
         updateSimState(0.02, 12);
+    }
+    public void periodic(){
+         m_field.setRobotPose(m_odometry.getEstimatedPosition());
+
     }
 
     public Pose2d getPose() {
